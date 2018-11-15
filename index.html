@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+  <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
+  <script src=".\app.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDvzMCsyGXydAQ64mJ6Wxqj5MMUQgMt5q0",
+    authDomain: "battleship-dd875.firebaseapp.com",
+    databaseURL: "https://battleship-dd875.firebaseio.com",
+    projectId: "battleship-dd875",
+    storageBucket: "battleship-dd875.appspot.com",
+    messagingSenderId: "835160490310"
+  };
+  firebase.initializeApp(config);
+</script>
+
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-content>
+
+
+        <!-- Sign-in Screen  -->
+        <v-container >
+            <v-layout row align-center justify-center style="background-color: rgb(147, 168, 226)">
+            <v-flex lg6>
+            <v-card class = "pa-3" >
+
+                <v-layout align-center justify-center>
+                    <h1>Battleship Origins</h1>
+                </v-layout>
+                    <v-layout column>
+                            <v-flex lg9 md9 sm6 class ="pa-2">
+                              <v-img :src="`pirateship.jpg`" aspect-ratio="2" transition="slide-x-transition">
+                            </v-flex>
+                          </v-layout>
+                
+            <v-layout row class="pa-4" justify-center>
+                
+                <v-flex >
+                        <v-text-field id="email"
+                          label="Email"
+                        ></v-text-field>
+                      </v-flex>
+            </v-layout>
+            <v-layout row class="pa-4" justify-center>
+                    <v-flex >
+                            <v-text-field id="password"
+                              label="Password"
+                            ></v-text-field>
+                          </v-flex> 
+            </v-layout>
+            <v-layout class="pa-4" justify-center>
+                          <template>
+                                <div >
+                                  <v-btn color="info" id="btnLogIn">Log In</v-btn>
+                                  <v-btn color="info" id="btnSignUp">Sign Up</v-btn>
+                                  <v-btn color="info" class = "hide" id="btnLogOut">Log Out</v-btn>
+                                </div>
+                                </template>     
+
+                            </v-layout>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+        </v-container>
+
+        <!-- End of sign-in screen -->
+
+        
+      </v-content>
+    </v-app>
+  </div>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  <script>
+    new Vue({ el: '#app' })
+    authenticate();
+  </script>
+</body>
+</html>
