@@ -1,6 +1,6 @@
 
 var battleship;
-
+const profilePicNums = 4;
 
 
 function authenticate(ship){
@@ -10,6 +10,7 @@ function authenticate(ship){
     const btnLogin = document.getElementById("btnLogIn");
     const btnSignup = document.getElementById("btnSignUp");
     const btnSignout = document.getElementById("btnLogOut");
+   
     
 
     //Add login 
@@ -25,6 +26,11 @@ function authenticate(ship){
         promise
         .then(() => {
             switchToLobby(email);
+            promise
+            .then(() => {
+            addNewGameButtonClickListener();
+            })
+            .catch(e => console.log(e.message));
         })
         .catch(e => console.log(e.message));
 
@@ -48,6 +54,7 @@ function authenticate(ship){
         promise
         .then(() => {
             switchToLobby(email);
+            addNewGameButtonClickListener();
         })
         .catch(e => console.log(e.message));
     });
@@ -68,23 +75,71 @@ function authenticate(ship){
 function switchToLobby(email){
     battleship.login = 1;
     battleship.username = email;
+
+    // populateGameTables();
+    // var profilePicture = document.getElementById("profilepic");
+    // profilePicture.src=battleship.userPicNum;
+}
+
+function addNewGameButtonClickListener(){
+
+    var profilePicNum = Math.floor(Math.random()*profilePicNums);
+    battleship.userPicNum = battleship.profilepics[profilePicNum];
     const btnNewGame=document.getElementById("btnNewGame");
-    btnNewGame.addEventListener('click', startNewGame());
+    btnNewGame.addEventListener('click', startNewGame);
+    console.log(Object.assign({}, battleship.games));
+    populateGameTables();
+}
+
+function createEmptyBoard(){
+    var board = [];
+    for (var x = 0; x < 10; x++){
+        board[x] = [0,0,0,0,0,0,0,0,0,0];
+    }
+    
+    return board;
+
 }
 
 
 function startNewGame(){
     playerOne = battleship.username;
-    playerTwo = "";
-    boardOne = [];
-    boardTwo = [];
+    playerTwo = "                  ";
+    boardOne = createEmptyBoard();
+    boardTwo = createEmptyBoard();
     messageOne = "";
     messageTwo = "";
-    status = "waiting";
+    status = 1;
     winner = "";
 
     let newGame = gameRef.push();
     newGame.set({playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
                     status: status, winner: winner});
+    
+}
+
+function populateGameTables(){
+    if (battleship != null){
+    var table = document.getElementById("availableGamesTable");
+    battleship.games=[];
+    gameRef.on("child_added", function(snapshot) {
+        if (!document.getElementById(snapshot.key)){
+            var values = snapshot.val();
+            
+            // battleship.games.push(values);
+            battleship.games.push(values);
+            
+            var games = Object.assign({},battleship.games);
+            
+            
+        }
+    });
+}
+}
+
+function drawGameTables(){
+    
+
+    console.log(battleship.games);
     
 }
