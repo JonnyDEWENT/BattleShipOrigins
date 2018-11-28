@@ -1,7 +1,7 @@
 
 var battleship;
 const profilePicNums = 4;
-
+var email;
 
 function authenticate(ship){
     battleship = ship;
@@ -15,7 +15,7 @@ function authenticate(ship){
 
     //Add login 
     btnLogin.addEventListener('click', e=>{
-        const email = txtEmail.value;
+        email = txtEmail.value;
         const password = txtPassword.value;
 
         const auth = firebase.auth();
@@ -113,7 +113,7 @@ function startNewGame(){
     winner = "";
 
     let newGame = gameRef.push();
-    newGame.set({playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
+    newGame.set({gameNumber: newGame.path.pieces_[1], playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
                     status: status, winner: winner});
     
 }
@@ -127,9 +127,19 @@ function populateGameTables(){
             var values = snapshot.val();
             
             // battleship.games.push(values);
-            battleship.games.push(values);
+            if (values.status == 1){
+            battleship.availableGames.push(values);
+            }
+
+            else if (values.status == 2){
+                battleship.gamesInProgress.push(values);
+                }
+
+            else if (values.status == 3){
+                battleship.pastGames.push(values);
+                }
             
-            var games = Object.assign({},battleship.games);
+            var games = Object.assign({},battleship.availableGames);
             
             
         }
@@ -142,4 +152,11 @@ function drawGameTables(){
 
     console.log(battleship.games);
     
+}
+
+function addPlayerTwo(theGame){
+  var path = "games/"+theGame.innerText;
+    firebase.database().ref().child(path).update({playerTwo: email, status: 2});
+    // newGame.playerTwo = auth.email;
+    // newGame.update({playerTwo: email, status: 2});
 }

@@ -65,7 +65,7 @@
                                 <div >
                                   <v-btn color="info" id="btnLogIn">Log In</v-btn>
                                   <v-btn color="info" id="btnSignUp">Sign Up</v-btn>
-                                  <!-- <v-btn color="info" class = "hide" id="btnLogOut">Log Out</v-btn> -->
+                                  
                                 </div>
                                 </template>     
 
@@ -100,10 +100,10 @@
 
 <!-- testing v-data-table -->
 
-
+<h1>Open games</h1>
 <v-data-table
       :headers="headers"
-      :items="games"
+      :items="availableGames"
       class="elevation-1"
     >
       <template slot="headerCell" slot-scope="props">
@@ -117,10 +117,62 @@
         </v-tooltip>
       </template>
       <template slot="items" slot-scope="props">
-        <td class="text-xs-right">{{ props.item.playerOne }}</td>
-        <td class="text-xs-right">{{ props.item.playerTwo }}</td>
-        <td class="text-xs-right">{{ props.item.status }}</td>
-        <td class="text-xs-right"><v-btn> join </v-btn></td>
+        <td >{{ props.item.playerOne }}</td>
+        <td >{{ props.item.playerTwo }}</td>
+        <td style="align-content: right">Waiting for another player...</td>
+        <td><v-btn class="text-transform-none" :input-value="`${props.item.gameNumber}`" onclick = "addPlayerTwo(this)" > join </v-btn></td>
+      </template>
+    </v-data-table>
+
+
+
+    <h1>Ongoing games</h1>
+<v-data-table
+      :headers="headers"
+      :items="gamesInProgress"
+      class="elevation-1"
+    >
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.text }}
+          </span>
+        </v-tooltip>
+      </template>
+      <template slot="items" slot-scope="props">
+        <td >{{ props.item.playerOne }}</td>
+        <td >{{ props.item.playerTwo }}</td>
+        <td style="align-content: right">In progress</td>
+        
+      </template>
+    </v-data-table>
+
+
+
+    <h1>Past games</h1>
+<v-data-table
+      :headers="headers"
+      :items="pastGames"
+      class="elevation-1"
+    >
+      <template slot="headerCell" slot-scope="props">
+        <v-tooltip bottom>
+          <span slot="activator">
+            {{ props.header.text }}
+          </span>
+          <span>
+            {{ props.header.text }}
+          </span>
+        </v-tooltip>
+      </template>
+      <template slot="items" slot-scope="props">
+        <td >{{ props.item.playerOne }}</td>
+        <td >{{ props.item.playerTwo }}</td>
+        <td style="align-content: right">{{ props.item.status }}</td>
+        
       </template>
     </v-data-table>
 
@@ -150,7 +202,7 @@
                         <template>
                               <div >
                                 <v-btn color="success" id="btnNewGame">New Game</v-btn>
-       
+                                <v-btn color="red" id="btnLogOut">Log Out</v-btn>
                               </div>
                               </template>     
 
@@ -176,7 +228,9 @@
         login: 0,
         username: "",
         userPicNum: "./images/anonUser.png",
-        games: [],
+        availableGames: [],
+        gamesInProgress: [],
+        pastGames: [],
         headers: ["player 1", "player 2", "Status"],
         profilepics: ["./images/pirate1.jpg", "./images/anonUser.png", "./images/daveyJones.png","./images/femalePirate.png"],
 
