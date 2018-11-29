@@ -73,7 +73,7 @@ function authenticate(ship){
 }
 
 function switchToLobby(email){
-    battleship.login = 1;
+    battleship.screen = 1;
     battleship.username = email;
 
     // populateGameTables();
@@ -155,8 +155,29 @@ function drawGameTables(){
 }
 
 function addPlayerTwo(theGame){
-  var path = "games/"+theGame.innerText;
-    firebase.database().ref().child(path).update({playerTwo: email, status: 2});
+  var path = 'games/'+theGame.innerText;
+  path = path.replace("\"","");
+//   gameRef.ref(theGame.textContent).update({playerTwo: email, status: 2});
+    var tempRef = gameRef.child(theGame.textContent.replace("\"",""));
+
+
+
+    var postData = {
+        playerTwo: email,
+         status: 2
+      };
+    
+    var updates = {};
+    var myGame = theGame.innerText;
+    // var myGame = new String(theGame.textContent);
+    // myGame = myGame.replace("\"","");
+    updates['/games/' + myGame + '/playerTwo'] = email;
+
+    return firebase.database().ref().update(updates);
+
+  
+    // tempRef.set({playerTwo: email, status: 2});
+    // firebase.database().ref().child(path).update({playerTwo: email, status: 2});
     // newGame.playerTwo = auth.email;
     // newGame.update({playerTwo: email, status: 2});
 }
