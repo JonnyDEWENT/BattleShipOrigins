@@ -1,7 +1,7 @@
 
 var battleship;
-
-
+const profilePicNums = 4;
+var email;
 
 function authenticate(ship){
     battleship = ship;
@@ -10,11 +10,12 @@ function authenticate(ship){
     const btnLogin = document.getElementById("btnLogIn");
     const btnSignup = document.getElementById("btnSignUp");
     const btnSignout = document.getElementById("btnLogOut");
+   
     
 
     //Add login 
     btnLogin.addEventListener('click', e=>{
-        const email = txtEmail.value;
+        email = txtEmail.value;
         const password = txtPassword.value;
 
         const auth = firebase.auth();
@@ -25,6 +26,11 @@ function authenticate(ship){
         promise
         .then(() => {
             switchToLobby(email);
+            promise
+            .then(() => {
+            addNewGameButtonClickListener();
+            })
+            .catch(e => console.log(e.message));
         })
         .catch(e => console.log(e.message));
 
@@ -48,6 +54,7 @@ function authenticate(ship){
         promise
         .then(() => {
             switchToLobby(email);
+            addNewGameButtonClickListener();
         })
         .catch(e => console.log(e.message));
     });
@@ -68,8 +75,20 @@ function authenticate(ship){
 function switchToLobby(email){
     battleship.login = 1;
     battleship.username = email;
+
+    // populateGameTables();
+    // var profilePicture = document.getElementById("profilepic");
+    // profilePicture.src=battleship.userPicNum;
+}
+
+function addNewGameButtonClickListener(){
+
+    var profilePicNum = Math.floor(Math.random()*profilePicNums);
+    battleship.userPicNum = battleship.profilepics[profilePicNum];
     const btnNewGame=document.getElementById("btnNewGame");
-    btnNewGame.addEventListener('click', startNewGame());
+    btnNewGame.addEventListener('click', startNewGame);
+    console.log(Object.assign({}, battleship.games));
+    populateGameTables();
 }
 
 function createEmptyBoard(){
@@ -85,7 +104,7 @@ function createEmptyBoard(){
 
 function startNewGame(){
     playerOne = battleship.username;
-    playerTwo = "";
+    playerTwo = "                  ";
     boardOne = createEmptyBoard();
     boardTwo = createEmptyBoard();
     messageOne = "";
@@ -94,7 +113,50 @@ function startNewGame(){
     winner = "";
 
     let newGame = gameRef.push();
-    newGame.set({playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
+    newGame.set({gameNumber: newGame.path.pieces_[1], playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
                     status: status, winner: winner});
     
+}
+
+function populateGameTables(){
+    if (battleship != null){
+    var table = document.getElementById("availableGamesTable");
+    battleship.games=[];
+    gameRef.on("child_added", function(snapshot) {
+        if (!document.getElementById(snapshot.key)){
+            var values = snapshot.val();
+            
+            // battleship.games.push(values);
+            if (values.status == 1){
+            battleship.availableGames.push(values);
+            }
+
+            else if (values.status == 2){
+                battleship.gamesInProgress.push(values);
+                }
+
+            else if (values.status == 3){
+                battleship.pastGames.push(values);
+                }
+            
+            var games = Object.assign({},battleship.availableGames);
+            
+            
+        }
+    });
+}
+}
+
+function drawGameTables(){
+    
+
+    console.log(battleship.games);
+    
+}
+
+function addPlayerTwo(theGame){
+  var path = "games/"+theGame.innerText;
+    firebase.database().ref().child(path).update({playerTwo: email, status: 2});
+    // newGame.playerTwo = auth.email;
+    // newGame.update({playerTwo: email, status: 2});
 }
