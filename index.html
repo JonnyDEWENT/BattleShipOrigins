@@ -4,7 +4,7 @@
   <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-
+  <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
   <script src=".\app.js"></script>
 <script>
@@ -120,7 +120,7 @@
         <td >{{ props.item.playerOne }}</td>
         <td >{{ props.item.playerTwo }}</td>
         <td style="align-content: right">Waiting for another player...</td>
-        <td><v-btn class="text-transform-none" :input-value="`${props.item.gameNumber}`" onclick = "addPlayerTwo(this)" > join </v-btn></td>
+        <td><v-btn v-model="availableGames.gameNumber" class="text-transform-none" :input-value="`${props.item.gameNumber}`" onclick = "addPlayerTwo(this)" style="text-transform: none !important"> {{props.item.gameNumber}} </v-btn></td>
       </template>
     </v-data-table>
 
@@ -153,7 +153,7 @@
 
 
     <h1>Past games</h1>
-<v-data-table
+  <v-data-table
       :headers="headers"
       :items="pastGames"
       class="elevation-1"
@@ -251,7 +251,7 @@
         availableGames: [],
         gamesInProgress: [],
         pastGames: [],
-        headers: ["player 1", "player 2", "Status"],
+        // headers: ["player 1", "player 2", "Status"],
         profilepics: ["./images/pirate1.jpg", "./images/anonUser.png", "./images/daveyJones.png","./images/femalePirate.png"],
 
 
@@ -265,7 +265,7 @@
         },
         { text: 'Player 2', value: 'playerTwo' },
         { text: 'Status', value: 'status' },
-        { text: 'Action', value: 'action' }
+        { text: 'Join Game #', value: 'action' }
       ]
        
       }
