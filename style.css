@@ -11,5 +11,5 @@ button {
 }
 
 .class {
-    text-transform: none;
+    text-transform: none !important;
 }
