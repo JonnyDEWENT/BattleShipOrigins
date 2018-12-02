@@ -2,107 +2,133 @@
 var battleship;
 const profilePicNums = 4;
 var email;
+var currentGameNode;
+var playerProfileNode;
 
-function authenticate(ship){
+function authenticate(ship) {
     battleship = ship;
     const txtEmail = document.getElementById("email");
     const txtPassword = document.getElementById("password");
     const btnLogin = document.getElementById("btnLogIn");
     const btnSignup = document.getElementById("btnSignUp");
     const btnSignout = document.getElementById("btnLogOut");
-   
-    
 
     //Add login 
-    btnLogin.addEventListener('click', e=>{
+    btnLogin.addEventListener('click', () => {
         email = txtEmail.value;
         const password = txtPassword.value;
-
         const auth = firebase.auth();
-
-        const promise = auth.signInWithEmailAndPassword(email,password);
-        
-
-        promise
-        .then(() => {
-            switchToLobby(email);
-            promise
+        auth.signInWithEmailAndPassword(email, password)
             .then(() => {
-            addNewGameButtonClickListener();
-            })
-            .catch(e => console.log(e.message));
-        })
-        .catch(e => console.log(e.message));
+                
+                // find playerprofile info...
+                node_profiles.once("value")
+                    .then(function (snapshot) {
+                        snapshot.forEach(function (childSnapshot) {
+                            let key = childSnapshot.key;
+                            let object = childSnapshot.val();
+                            let iterateProfileEmail = object.email;
+                            if (iterateProfileEmail == email) {
+                                alert("Match found! email = " + email + ", matched email = " + iterateProfileEmail);
+                                playerProfileNode = childSnapshot;
+                                return true;
+                            }
+                        })
+                    });
 
+                alert("got out!");
+
+                // playerProfileNode = ??;
+                switchToLobby(email);
+            })
+            .then(() => {
+                addNewGameButtonClickListener();
+            })
+            .catch(e => {
+                console.log(e.message);
+                alert(e.message);
+                alert("Oops!  That login did not work!  Try again!");
+            });
     });
+
 
     btnSignout.addEventListener('click', e => {
         firebase.auth().signOut();
-
+        alert("You've been signed out!");
     });
 
-    
-    btnSignup.addEventListener('click', e=> {
+
+    btnSignup.addEventListener('click', e => {
         const email = txtEmail.value;
         const password = txtPassword.value;
-
         const auth = firebase.auth();
-
-        const promise = auth.createUserWithEmailAndPassword(email,password);
-        
-
+        const promise = auth.createUserWithEmailAndPassword(email, password);
         promise
-        .then(() => {
-            switchToLobby(email);
-            addNewGameButtonClickListener();
-        })
-        .catch(e => console.log(e.message));
+            .then(() => {
+
+                // create new player profile in database...
+                playerProfileNode = node_profiles.push();
+                playerProfileNode.set({
+                    email: email,
+                    playerName: "PlayerName",
+                    friends: [],
+                    stats: {},
+                    openInvitations: []
+                });
+                switchToLobby(email);
+                addNewGameButtonClickListener();
+            })
+            .catch(e => {
+                console.log(e.message);
+                alert(e.message);
+            })
     });
 
-        firebase.auth().onAuthStateChanged(firebaseUser => {
-            if(firebaseUser){
-                console.log(firebaseUser);
-                btnSignout.classList.remove('hide');
-            }
-            else {
-                console.log('not logged in');
-            }
-        });
-   
-
+    firebase.auth().onAuthStateChanged(firebaseUser => {
+        if (firebaseUser) {
+            console.log(firebaseUser);
+            btnSignout.classList.remove('hide');
+        }
+        else {
+            console.log('not logged in');
+        }
+    });
 }
 
-function switchToLobby(email){
+function switchToLobby(email) {
     battleship.screen = 1;
     battleship.username = email;
+
+    // set playerProfile here to match profile in list!
+
+    // then, populate their profile info from there!
 
     // populateGameTables();
     // var profilePicture = document.getElementById("profilepic");
     // profilePicture.src=battleship.userPicNum;
 }
 
-function addNewGameButtonClickListener(){
-
-    var profilePicNum = Math.floor(Math.random()*profilePicNums);
+function addNewGameButtonClickListener() {
+    var profilePicNum = Math.floor(Math.random() * profilePicNums);
     battleship.userPicNum = battleship.profilepics[profilePicNum];
-    const btnNewGame=document.getElementById("btnNewGame");
+    const btnNewGame = document.getElementById("btnNewGame");
     btnNewGame.addEventListener('click', startNewGame);
     console.log(Object.assign({}, battleship.games));
     populateGameTables();
 }
 
-function createEmptyBoard(){
+function createEmptyBoard() {
     var board = [];
-    for (var x = 0; x < 10; x++){
-        board[x] = [0,0,0,0,0,0,0,0,0,0];
+    for (var x = 0; x < 10; x++) {
+        board[x] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
-    
-    return board;
 
+    return board;
 }
 
 
-function startNewGame(){
+function startNewGame() {
+    // setup
     playerOne = battleship.username;
     playerTwo = "                  ";
     boardOne = createEmptyBoard();
@@ -112,128 +138,144 @@ function startNewGame(){
     status = 1;
     winner = "";
 
-    let newGame = gameRef.push();
-    newGame.set({gameNumber: newGame.path.pieces_[1], playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
-                    status: status, winner: winner});
-    
-}
-
-function populateGameTables(){
-    if (battleship != null){
-    var table = document.getElementById("availableGamesTable");
-
-    gameRef.on("child_added", function(snapshot) {
-
-        if (!document.getElementById(snapshot.key)){
-            var values = snapshot.val();
-            
-            // battleship.games.push(values);
-            if (values.status == 1){
-            battleship.availableGames.push(values);
-            }
-
-            else if (values.status == 2){
-                battleship.gamesInProgress.push(values);
-                }
-
-            else if (values.status == 3){
-                battleship.pastGames.push(values);
-                }
-            
-            var games = Object.assign({},battleship.availableGames);
-            
-            
-        }
+    currentGameNode = node_matches.push();
+    alert(currentGameNode);
+    // alert(playerProfile);
+    currentGameNode.set({
+        player: playerProfileNode,
+        opponent: null,
+        gameNumber: currentGameNode.path.pieces_[1],
+        playerOne: playerOne,
+        playerTwo: playerTwo,
+        boardOne: boardOne,
+        boardTwo: boardTwo,
+        messageOne: messageOne,
+        messageTwo: messageTwo,
+        status: status,
+        winner: winner
     });
 
-
-    gameRef.on("child_changed", function(snapshot) {
-
-        if (!document.getElementById(snapshot.key)){
-            var values = snapshot.val();
-            
-            // battleship.games.push(values);
-            if (values.status == 1){
-            battleship.availableGames.push(values);
-            }
-
-            else if (values.status == 2){
-                battleship.gamesInProgress.push(values);
-                removeFromAvailable(values.gameNumber,battleship.availableGames);
-                
-                }
-
-            else if (values.status == 3){
-                battleship.pastGames.push(values);
-                removeFromAvailable(values.gameNumber,battleship.gamesInProgress);
-                }
-            
-            var games = Object.assign({},battleship.availableGames);
-            
-            
-        }
-    });
+    // switch to UI
 
 
-    gameRef.on("child_removed", function(snapshot) {
- 
-        if (!document.getElementById(snapshot.key)){
-            var values = snapshot.val();
-            
-            // battleship.games.push(values);
-            if (values.status == 1){
-            battleship.availableGames.push(values);
-            }
-
-            else if (values.status == 2){
-                battleship.gamesInProgress.push(values);
-                }
-
-            else if (values.status == 3){
-                battleship.pastGames.push(values);
-                }
-            
-            var games = Object.assign({},battleship.availableGames);
-            
-            
-        }
-    });
-}
 }
 
-function removeFromAvailable(key,array){
+function populateGameTables() {
+    if (battleship != null) {
+        var table = document.getElementById("availableGamesTable");
+
+        node_matches.on("child_added", function (snapshot) {
+
+            if (!document.getElementById(snapshot.key)) {
+                var values = snapshot.val();
+
+                // battleship.games.push(values);
+                if (values.status == 1) {
+                    battleship.availableGames.push(values);
+                }
+
+                else if (values.status == 2) {
+                    battleship.gamesInProgress.push(values);
+                }
+
+                else if (values.status == 3) {
+                    battleship.pastGames.push(values);
+                }
+
+                var games = Object.assign({}, battleship.availableGames);
+
+
+            }
+        });
+
+
+        node_matches.on("child_changed", function (snapshot) {
+
+            if (!document.getElementById(snapshot.key)) {
+                var values = snapshot.val();
+
+                // battleship.games.push(values);
+                if (values.status == 1) {
+                    battleship.availableGames.push(values);
+                }
+
+                else if (values.status == 2) {
+                    battleship.gamesInProgress.push(values);
+                    removeFromAvailable(values.gameNumber, battleship.availableGames);
+
+                }
+
+                else if (values.status == 3) {
+                    battleship.pastGames.push(values);
+                    removeFromAvailable(values.gameNumber, battleship.gamesInProgress);
+                }
+
+                var games = Object.assign({}, battleship.availableGames);
+
+
+            }
+        });
+
+
+        node_matches.on("child_removed", function (snapshot) {
+
+            if (!document.getElementById(snapshot.key)) {
+                var values = snapshot.val();
+
+                // battleship.games.push(values);
+                if (values.status == 1) {
+                    battleship.availableGames.push(values);
+                }
+
+                else if (values.status == 2) {
+                    battleship.gamesInProgress.push(values);
+                }
+
+                else if (values.status == 3) {
+                    battleship.pastGames.push(values);
+                }
+
+                var games = Object.assign({}, battleship.availableGames);
+
+
+            }
+        });
+    }
+}
+
+function removeFromAvailable(key, array) {
     var arr = array;
-    for (var i=0; i < arr.length; i++){
-        if(arr[i].gameNumber === key){
-            arr.splice(i,1);
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i].gameNumber === key) {
+            arr.splice(i, 1);
         }
     }
 }
 
-function drawGameTables(){
-    
+function drawGameTables() {
+
 
     console.log(battleship.games);
-    
+
 }
 
-function addPlayerTwo(theGame){
-  var path = 'games/'+theGame.innerText;
-  path = path.replace("\"","");
-    var tempRef = gameRef.child(theGame.textContent.replace("\"",""));
+function addPlayerTwo(theGame) {
+    var path = 'games/' + theGame.innerText;
+    path = path.replace("\"", "");
+    var tempRef = node_matches.child(theGame.textContent.replace("\"", ""));
 
 
 
     var postData = {
         playerTwo: email,
-         status: 2
+        status: 2
 
-      };
-    
+    };
+
     var updates = {};
     var myGame = theGame.innerText;
     updates['/games/' + myGame + '/playerTwo'] = email;
-    updates['/games/' + myGame + '/status'] = 2; 
+    updates['/games/' + myGame + '/status'] = 2;
 
     return firebase.database().ref().update(updates);
 
