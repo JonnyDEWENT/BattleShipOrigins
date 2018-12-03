@@ -55,6 +55,10 @@ function authenticate(ship){
         .then(() => {
             switchToLobby(email);
             addNewGameButtonClickListener();
+            let newUser = userRef.push();
+            var gamesPlayed = 0;
+            var wins = 0;
+            newUser.set({email: email, gamesPlayed: 0, wins: 0});
         })
         .catch(e => console.log(e.message));
     });
@@ -111,10 +115,12 @@ function startNewGame(){
     messageTwo = "";
     status = 1;
     winner = "";
+    turn = 0;
 
     let newGame = gameRef.push();
     newGame.set({gameNumber: newGame.path.pieces_[1], playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
                     status: status, winner: winner});
+    startGame(newGame);
     
 }
 
@@ -235,6 +241,8 @@ function addPlayerTwo(theGame){
     updates['/games/' + myGame + '/playerTwo'] = email;
     updates['/games/' + myGame + '/status'] = 2; 
 
-    return firebase.database().ref().update(updates);
+    // return firebase.database().ref().update(updates);
+    firebase.database().ref().update(updates);
+    startGame(myGame);
 
 }
