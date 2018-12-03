@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
   <script src=".\app.js"></script>
+
+
+  <!-- <script src=".\ENTER YOUR JAVASCRIPT FILENAME HERE RYAN></script> -->
+
+
 <script>
   // Initialize Firebase
   var config = {
@@ -56,7 +61,8 @@
             <v-layout row class="pa-4" justify-center>
                     <v-flex >
                             <v-text-field id="password"
-                              label="Password"
+                              label="Password" 
+                              :type="'password'"
                             ></v-text-field>
                           </v-flex> 
             </v-layout>
@@ -87,8 +93,16 @@
               <v-layout align-center justify-center>
                   <h1>Welcome {{username}}!</h1>
               </v-layout>
-                  <v-layout column>
-                          <v-flex lg9 md9 sm6 class ="pa-2">
+              <v-layout align-center justify-center>
+              <h2>Games Played: {{gamesPlayed}}</h2>
+            </v-layout>
+            <v-layout align-center justify-center>
+                <h2>Games Won: {{gamesWon}} </h2>
+              </v-layout>
+           
+                  <v-layout row align-center justify-center>
+
+                          <v-flex lg6 md6 sm6 class ="pa-2">
                             <v-img :src="`${userPicNum}`" aspect-ratio="2" transition="slide-x-transition" id="profilepic">
                           </v-flex>
                         </v-layout>
@@ -187,17 +201,6 @@
           <v-card>
           <v-layout class="pa-4" justify-center>
               <template>
-                  <!-- <v-data-table
-                    :headers="headers"
-                    :items="games"
-                    class="elevation-1"
-                  >
-                  <template slot="items" slot-scope="props">
-                      <td class="text-xs-right">{{ props.item.playerOne }}</td>
-                      <td class="text-xs-right">{{ props.item.playerTwo }}</td>
-                      <td class="text-xs-right">{{ props.item.playerThree }}</td>
-                    </template>
-                  </v-data-table> -->
                 </template>
                         <template>
                               <div >
@@ -222,8 +225,7 @@
 <!-- RYAN PUT BATTLE SHIP GAME UI STUFF HERE -->
 <v-container style="background-color: black" v-show="screen === 2">
 
-
-
+  
 
 
 
@@ -266,7 +268,10 @@
         { text: 'Player 2', value: 'playerTwo' },
         { text: 'Status', value: 'status' },
         { text: 'Join Game #', value: 'action' }
-      ]
+      ],
+
+      gamesPlayed: 0,
+      gamesWon: 0
        
       }
      })

@@ -85,10 +85,10 @@ function switchToLobby(email){
 
     if (newUser > 0) {
     let newUser = userRef.child(uid);
-    var gamesPlayed = 0;
-    var wins = 0;
+    var gamesPlayed = 2;
+    var wins = 1;
     var myUid = uid;
-    newUser.set({email: email, gamesPlayed: 0, wins: 0, user_id: myUid});
+    newUser.set({email: email, gamesPlayed: gamesPlayed, wins: wins, user_id: myUid});
     }
 
     getUserData(uid);
@@ -104,17 +104,18 @@ function switchToSignIn(){
 }
 
 function getUserData(auth){
-    console.log("UID: " + auth);
+    console.log(auth);
     const db = firebase.database();
-    const events = db.ref('users');
-    const query = events.orderByChild('user_id').equalTo(auth).limitToFirst(1);
-    query.on('value',snap => {
-        console.log(snap.val());
+    const user = db.ref('/users/' + auth);
+    // const query = events.orderByChild('user_id').equalTo(auth).limitToFirst(1);
+    user.on('value',snap => {
+        var value = snap.val();
+        battleship.gamesPlayed = value.gamesPlayed;
+        battleship.gamesWon = value.wins;
     });
 }
 
 function addNewGameButtonClickListener(){
-
     var profilePicNum = Math.floor(Math.random()*profilePicNums);
     battleship.userPicNum = battleship.profilepics[profilePicNum];
     const btnNewGame=document.getElementById("btnNewGame");
@@ -125,30 +126,69 @@ function addNewGameButtonClickListener(){
 
 function createEmptyBoard(){
     var board = [];
-    for (var x = 0; x < 10; x++){
-        board[x] = [0,0,0,0,0,0,0,0,0,0];
+    for (var x = 0; x < 5; x++){
+        board[x] = [0,0,0,0,0];
+        var shipLocation = Math.floor(Math.random() * 5)
+        board[x][shipLocation] = 1;
     }
-    
-    return board;
 
+    return board;
 }
+
+
+    function randomizeMyBoard(board){
+        var spots = [];
+        for(var i = 0; i < 7; i++){
+            var shipLocation = Math.floor(Math.random() * 100);
+            if (!spots.includes[shipLocation]){
+                spots[i] = shipLocation;
+                var x = shipLocation % 10;
+                var y = shipLocation / 10;
+                    board[x][y] = 1;
+            }
+            else {
+                i--;
+            }
+    
+        }
+        return board;
+    }
+
 
 
 function startNewGame(){
     playerOne = battleship.username;
     playerTwo = "                  ";
     boardOne = createEmptyBoard();
-    boardTwo = createEmptyBoard();
+    boardTwo = createEmptyBoard();  
     messageOne = "";
     messageTwo = "";
     status = 1;
     winner = "";
-    turn = 0;
+    turn = email;
 
     let newGame = gameRef.push();
+    let gameKey = newGame.key;
+    console.log("This is the game key " + gameKey + "\nPlayer key: " + uid);
+
+    newGameRefString = "/games/" + gameKey;
+    userRefString = "/users/"+ uid;
+
+    console.log("This is the game key full path " + newGameRefString + "\nPlayer key full path: " + userRefString);
+
+
     newGame.set({gameNumber: newGame.path.pieces_[1], playerOne: playerOne, playerTwo: playerTwo, boardOne: boardOne, boardTwo: boardTwo, messageOne: messageOne, messageTwo: messageTwo,
-                    status: status, winner: winner});
-    startGame(newGame);
+                    status: status, winner: winner, turn: turn});
+
+
+        /* RYAN THIS IS THE ENTRY POINT TO YOUR BATTLESHIP GAME CODE. PASSING GAME REF STRING AND USER REFSTRING. FEEL FREE TO CHANGE THE FUNCTION NAME TO MATCH YOUR
+        STARTING FUNCTION NAME IN YOU CODE */
+    startGame(newGameRefString,userRefString);
+
+    /*********************************END OF YOUR EDIT AREA :) ******************************************************************************************/
+
+    // updating lobby screen user data display after game
+    getUserData(uid);
     
 }
 
@@ -266,11 +306,22 @@ function addPlayerTwo(theGame){
     
     var updates = {};
     var myGame = theGame.innerText;
+    
     updates['/games/' + myGame + '/playerTwo'] = email;
     updates['/games/' + myGame + '/status'] = 2; 
+    newGameRefString = '/games/' + myGame
+    userRefString = "/users/"+ uid;
 
     // return firebase.database().ref().update(updates);
     firebase.database().ref().update(updates);
-    startGame(myGame);
+    
+        /* RYAN THIS IS THE ENTRY POINT TO YOUR BATTLESHIP GAME CODE. PASSING GAME REF STRING AND USER REFSTRING. FEEL FREE TO CHANGE THE FUNCTION NAME TO MATCH YOUR
+        STARTING FUNCTION NAME IN YOUR CODE */
+        startGame(newGameRefString,userRefString);
+
+        /*********************************END OF YOUR EDIT AREA :) ******************************************************************************************/
+    
+        // updating lobby screen user data display after game
+        getUserData(uid);
 
 }
