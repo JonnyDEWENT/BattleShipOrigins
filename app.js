@@ -2,8 +2,24 @@
 var battleship;
 const profilePicNums = 4;
 var email;
+
 var currentGameNode;
 var playerProfileNode;
+
+function findPlayerProfile(email) {
+    node_profiles.on("value", function (snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+            var object = childSnapshot.val();
+            let iterateProfileEmail = object.email;
+            if (iterateProfileEmail == email) {
+                // alert("Match found! email = " + email + ", matched email = " + iterateProfileEmail);
+                // playerProfileNode = object;
+                // console.log("playerProfileNode: " + playerProfileNode.email);
+                return object;
+            }
+        })
+    });
+}
 
 function authenticate(ship) {
     battleship = ship;
@@ -20,25 +36,29 @@ function authenticate(ship) {
         const auth = firebase.auth();
         auth.signInWithEmailAndPassword(email, password)
             .then(() => {
-                
+
+
+
+                // starCountRef.on('value', function (snapshot) {
+                //     updateStarCount(postElement, snapshot.val());
+                // });
+
+
                 // find playerprofile info...
-                node_profiles.once("value")
-                    .then(function (snapshot) {
-                        snapshot.forEach(function (childSnapshot) {
-                            let key = childSnapshot.key;
-                            let object = childSnapshot.val();
-                            let iterateProfileEmail = object.email;
-                            if (iterateProfileEmail == email) {
-                                alert("Match found! email = " + email + ", matched email = " + iterateProfileEmail);
-                                playerProfileNode = childSnapshot;
-                                return true;
-                            }
-                        })
-                    });
+                node_profiles.on("value", function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
+                        var object = childSnapshot.val();
+                        let iterateProfileEmail = object.email;
+                        if (iterateProfileEmail == email) {
+                            alert("Match found! email = " + email + ", matched email = " + iterateProfileEmail);
+                            playerProfileNode = object;
+                            console.log("playerProfileNode: " + playerProfileNode.email);
+                            return true;
+                        }
+                    })
+                });
 
-                alert("got out!");
-
-                // playerProfileNode = ??;
+                // alert("Find profile result = " + findPlayerProfile(email).email);
                 switchToLobby(email);
             })
             .then(() => {
@@ -74,7 +94,9 @@ function authenticate(ship) {
                     friends: [],
                     stats: {},
                     openInvitations: []
-                });
+                })
+            })
+            .then(() => {
                 switchToLobby(email);
                 addNewGameButtonClickListener();
             })
@@ -98,15 +120,30 @@ function authenticate(ship) {
 function switchToLobby(email) {
     battleship.screen = 1;
     battleship.username = email;
+    battleship.playerProfileNode = playerProfileNode;
 
-    // set playerProfile here to match profile in list!
+    playerProfileNode.once("value")
+        .then(function (snapshot) {
+            let key = snapshot.key;
+            let object = snapshot.val();
+            alert("lobby switch email = " + key + ", other = " + object.email);
+        })
 
-    // then, populate their profile info from there!
 
-    // populateGameTables();
-    // var profilePicture = document.getElementById("profilepic");
-    // profilePicture.src=battleship.userPicNum;
-}
+    // alert("switch: " + playerProfileNode.email);
+
+};
+
+// alert("selected profile: " + playerProfileNode.key);
+
+// set playerProfile here to match profile in list!
+
+// then, populate their profile info from there!
+
+// populateGameTables();
+// var profilePicture = document.getElementById("profilepic");
+// profilePicture.src=battleship.userPicNum;
+
 
 function addNewGameButtonClickListener() {
     var profilePicNum = Math.floor(Math.random() * profilePicNums);

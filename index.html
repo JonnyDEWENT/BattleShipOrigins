@@ -5,6 +5,7 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <meta charset="UTF-8" />
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
     <script src="./app.js"></script>
@@ -20,18 +21,72 @@
         };
         firebase.initializeApp(config);
         var database = firebase.database();
+        firebase.database.enableLogging(function (message) {
+            console.log("\t[FIREBASE]", message);
+        });
         var rootRef = firebase.database().ref();
-        var node_matches = database.ref("matches");
-        var node_profiles = database.ref("profiles");
+        var node_matches = database.ref("games");
+        var node_profiles = database.ref("users");
     </script>
 
+    <style>
+        td {
+            padding: 20px;
+            margin: 3px;
+            background-color: yellow;
+        }
+
+        .hit {
+            background-color: red;
+        }
+
+        .miss {
+            background-color: blue;
+        }
+
+        .normal {
+            background-color: gray;
+        }
+
+        .ship {
+            background-color: green;
+        }
+
+        .image {
+            width: 20%;
+            height: 20%;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app">
-        <v-app>
-            <v-content>
 
+    
+    <table>
+        <tr>
+            <td class="hit"><img class="image" src="./images/ocean01.jpg" alt="fail" /></td>
+            <td class="miss"></td>
+            <td class="ship"></td>
+        </tr>
+        <tr>
+            <td class="normal"></td>
+            <td class="hit"></td>
+            <td class="miss"></td>
+        </tr>
+        <tr>
+            <td class="normal"></td>
+            <td class="miss"></td>
+            <td class="normal"></td>
+        </tr>
+    </table>
+    <div id="app">
+            <div>{{testString}}</div>
+
+        <v-app>
+            <button-counter></button-counter>
+            <!-- <world-clock src="./images/ocean01.jpg"></world-clock> -->
+            <v-content>
+                <button-counter></button-counter>
                 <!-- Sign-in Screen  -->
                 <v-container style="background-color: black" v-show="screen == 0">
                     <v-layout row align-center justify-center style="background-color: rgb(76, 113, 216)">
@@ -241,16 +296,72 @@
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
     <script>
+        Vue.component('button-counter', {
+            data: function () {
+                return {
+                    count: 0
+                }
+            },
+            template: '<button v-on:click="count++">You clicked me {{ count }} times.</button>'
+        });
+
+
+        Vue.component('world-clock', {
+            template: '<td><img v-bind:src="image" name="name" grid="grid" onclick="updateTable"/></td>',
+            props: {
+                clickable: {
+                    required: true,
+                    type: Boolean
+                },
+                name: {
+                    type: String,
+                    required: true
+                },
+                gridBelongsTo: {
+                    type: String,
+                    require: true
+                },
+                image: {
+                    type: String,
+                    required: true
+                },
+                format: {
+                    type: String,
+                    default: 'HH: mm'
+                }
+            }
+        });
+
+
+        // Vue.component('world-clock', {
+        //     template: '< div > {{ timeStr }}</div >',
+        //     // use an object for
+        //     // extended definition of properties
+        //     // RECOMMENDED
+        //     props: {
+        //         format: {
+        //             type: String,
+        //             default: 'HH: mm'
+        //         },
+        //         timeZone: {
+        //             type: String,
+        //             required: true,
+        //             default: 'UTC'
+        //         }
+        //     }
+        // });
+
         var battleship = new Vue({
             el: '#app',
             data: {
+                testString: "hello, this is Bob!",
                 screen: 0,
+                playerProfile: null,
                 username: "",
                 userPicNum: "./images/anonUser.png",
-                availableGames: [],
+                availableGames: [], // this should be in playerProfile info
                 gamesInProgress: [],
                 pastGames: [],
-                // headers: ["player 1", "player 2", "Status"],
                 profilepics: ["./images/pirate1.jpg", "./images/anonUser.png", "./images/daveyJones.png", "./images/femalePirate.png"],
                 headers: [
                     {
@@ -265,7 +376,9 @@
                 ]
 
             }
-        })
+        });
+
+
         authenticate(battleship);
     </script>
 </body>
