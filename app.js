@@ -2,6 +2,9 @@
 var battleship;
 const profilePicNums = 4;
 var email;
+var uid;
+var newUser = 0;
+
 
 function authenticate(ship){
     battleship = ship;
@@ -19,7 +22,6 @@ function authenticate(ship){
         const password = txtPassword.value;
 
         const auth = firebase.auth();
-
         const promise = auth.signInWithEmailAndPassword(email,password);
         
 
@@ -29,6 +31,7 @@ function authenticate(ship){
             promise
             .then(() => {
             addNewGameButtonClickListener();
+           
             })
             .catch(e => console.log(e.message));
         })
@@ -38,6 +41,7 @@ function authenticate(ship){
 
     btnSignout.addEventListener('click', e => {
         firebase.auth().signOut();
+        switchToSignIn();
 
     });
 
@@ -53,12 +57,9 @@ function authenticate(ship){
 
         promise
         .then(() => {
+            newUser = 1;
             switchToLobby(email);
             addNewGameButtonClickListener();
-            let newUser = userRef.push();
-            var gamesPlayed = 0;
-            var wins = 0;
-            newUser.set({email: email, gamesPlayed: 0, wins: 0});
         })
         .catch(e => console.log(e.message));
     });
@@ -66,7 +67,9 @@ function authenticate(ship){
         firebase.auth().onAuthStateChanged(firebaseUser => {
             if(firebaseUser){
                 console.log(firebaseUser);
+                uid = firebaseUser.uid;
                 btnSignout.classList.remove('hide');
+
             }
             else {
                 console.log('not logged in');
@@ -80,9 +83,34 @@ function switchToLobby(email){
     battleship.screen = 1;
     battleship.username = email;
 
+    if (newUser > 0) {
+    let newUser = userRef.child(uid);
+    var gamesPlayed = 0;
+    var wins = 0;
+    var myUid = uid;
+    newUser.set({email: email, gamesPlayed: 0, wins: 0, user_id: myUid});
+    }
+
+    getUserData(uid);
+   
+
     // populateGameTables();
     // var profilePicture = document.getElementById("profilepic");
     // profilePicture.src=battleship.userPicNum;
+}
+
+function switchToSignIn(){
+    battleship.screen = 0;
+}
+
+function getUserData(auth){
+    console.log("UID: " + auth);
+    const db = firebase.database();
+    const events = db.ref('users');
+    const query = events.orderByChild('user_id').equalTo(auth).limitToFirst(1);
+    query.on('value',snap => {
+        console.log(snap.val());
+    });
 }
 
 function addNewGameButtonClickListener(){
