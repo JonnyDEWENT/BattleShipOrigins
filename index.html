@@ -7,10 +7,42 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://www.gstatic.com/firebasejs/5.5.8/firebase.js"></script>
   <script src=".\app.js"></script>
-
+    <style>
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        h1 {
+            color: green;
+            font-size: 350%;
+            margin: auto;
+        }
+        h2 {
+            color: orange;
+            font-size: 320%;
+        }
+        #playerName {
+            float: right;
+            color: red;
+            font-size: 450%;
+        }
+        #battleArea {
+            background-color: black;
+        }
+        #playerTable, #enemyTable {
+            margin: auto;
+        }
+        #flagImage, #flagDiv {
+            width: 50%;
+            height: 50%;
+        }
+    </style>
+    <meta charset="UTF-8" />
 
   <!-- <script src=".\ENTER YOUR JAVASCRIPT FILENAME HERE RYAN></script> -->
-
+    <script src=".\battleshipLogic.js"></script>
 
 <script>
   // Initialize Firebase
@@ -54,7 +86,7 @@
                 
                 <v-flex >
                         <v-text-field id="email"
-                          label="Email"
+                          label="Email" value="bassorm@gmail.com"
                         ></v-text-field>
                       </v-flex>
             </v-layout>
@@ -62,7 +94,7 @@
                     <v-flex >
                             <v-text-field id="password"
                               label="Password" 
-                              :type="'password'"
+                              :type="'password'" value="battleMATEY01"
                             ></v-text-field>
                           </v-flex> 
             </v-layout>
@@ -223,7 +255,7 @@
 
 
 <!-- RYAN PUT BATTLE SHIP GAME UI STUFF HERE -->
-<v-container style="background-color: black" v-show="screen === 2">
+<v-container style="background-color: black" v-show="screen === 3">
 
   
 
@@ -234,12 +266,101 @@
 
 </v-container>
 
+
+
 <!-- END OF BATTLE SHIP GAME UI -->
 
 
       </v-content>
     </v-app>
   </div>
+
+  <div class="hidden" id="battleArea">
+        <div id="flagDiv"></div>
+      <h1 id="playerName"></h1>
+
+      <h1 id="turn"></h1>
+      <h2>YOUR SHIPS</h2>
+    <table id="playerTable">
+        <tr>
+            <td><button id="P00">P</button></td>
+            <td><button id="P01">P</button></td>
+            <td><button id="P02">P</button></td>
+            <td><button id="P03">P</button></td>
+            <td><button id="P04">P</button></td>
+        </tr>
+        <tr>
+                <td><button id="P10">P</button></td>
+                <td><button id="P11">P</button></td>
+                <td><button id="P12">P</button></td>
+                <td><button id="P13">P</button></td>
+                <td><button id="P14">P</button></td>
+        </tr>
+        <tr>
+            <td><button id="P20">P</button></td>
+            <td><button id="P21">P</button></td>
+            <td><button id="P22">P</button></td>
+            <td><button id="P23">P</button></td>
+            <td><button id="P24">P</button></td>
+        </tr>
+        <tr>
+                <td><button id="P30">P</button></td>
+                <td><button id="P31">P</button></td>
+                <td><button id="P32">P</button></td>
+                <td><button id="P33">P</button></td>
+                <td><button id="P34">P</button></td>
+        </tr>
+        <tr>
+                <td><button id="P40">P</button></td>
+                <td><button id="P41">P</button></td>
+                <td><button id="P42">P</button></td>
+                <td><button id="P43">P</button></td>
+                <td><button id="P44">P</button></td>
+            </tr>
+    </table>
+    <hr />
+    <h2>ENEMY SHIPS</h2>
+    <table id="enemyTable">
+            <tr>
+                <td><button id="E00" onclick="shootTorpedoAt('E00')">E</button></td>
+                <td><button id="E01" onclick="shootTorpedoAt('E01')">E</button></td>
+                <td><button id="E02" onclick="shootTorpedoAt('E02')">E</button></td>
+                <td><button id="E03" onclick="shootTorpedoAt('E03')">E</button></td>
+                <td><button id="E04" onclick="shootTorpedoAt('E04')">E</button></td>
+            </tr>
+            <tr>
+                    <td><button id="E10" onclick="shootTorpedoAt('E10')">E</button></td>
+                    <td><button id="E11" onclick="shootTorpedoAt('E11')">E</button></td>
+                    <td><button id="E12" onclick="shootTorpedoAt('E12')">E</button></td>
+                    <td><button id="E13" onclick="shootTorpedoAt('E13')">E</button></td>
+                    <td><button id="E14" onclick="shootTorpedoAt('E14')">E</button></td>
+            </tr>
+            <tr>
+                <td><button id="E20" onclick="shootTorpedoAt('E20')">E</button></td>
+                <td><button id="E21" onclick="shootTorpedoAt('E21')">E</button></td>
+                <td><button id="E22" onclick="shootTorpedoAt('E22')">E</button></td>
+                <td><button id="E23" onclick="shootTorpedoAt('E23')">E</button></td>
+                <td><button id="E24" onclick="shootTorpedoAt('E24')">E</button></td>
+            </tr>
+            <tr>
+                    <td><button id="E30" onclick="shootTorpedoAt('E30')">E</button></td>
+                    <td><button id="E31" onclick="shootTorpedoAt('E31')">E</button></td>
+                    <td><button id="E32" onclick="shootTorpedoAt('E32')">E</button></td>
+                    <td><button id="E33" onclick="shootTorpedoAt('E33')">E</button></td>
+                    <td><button id="E34" onclick="shootTorpedoAt('E34')">E</button></td>
+            </tr>
+            <tr>
+                    <td><button id="E40" onclick="shootTorpedoAt('E40')">E</button></td>
+                    <td><button id="E41" onclick="shootTorpedoAt('E41')">E</button></td>
+                    <td><button id="E42" onclick="shootTorpedoAt('E42')">E</button></td>
+                    <td><button id="E43" onclick="shootTorpedoAt('E43')">E</button></td>
+                    <td><button id="E44" onclick="shootTorpedoAt('E44')">E</button></td>
+                </tr>
+        </table>
+
+
+</div>
+
  
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
@@ -255,6 +376,7 @@
         pastGames: [],
         // headers: ["player 1", "player 2", "Status"],
         profilepics: ["./images/pirate1.jpg", "./images/anonUser.png", "./images/daveyJones.png","./images/femalePirate.png"],
+        
 
 
 
