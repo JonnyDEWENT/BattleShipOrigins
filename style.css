@@ -9,3 +9,38 @@ button {
 .hide {
     visibility: hidden;
 }
+
+.class {
+    text-transform: none !important;
+}
+
+.hidden {
+    display: none;
+}
+.visible {
+    display: block;
+}
+h1 {
+    color: green;
+    font-size: 350%;
+    margin: auto;
+}
+h2 {
+    color: orange;
+    font-size: 320%;
+}
+#playerName {
+    float: right;
+    color: red;
+    font-size: 450%;
+}
+#battleArea {
+    background-color: black;
+}
+#playerTable, #enemyTable {
+    margin: auto;
+}
+#flagImage, #flagDiv {
+    width: 50%;
+    height: 50%;
+}
