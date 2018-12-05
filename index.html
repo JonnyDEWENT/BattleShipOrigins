@@ -131,7 +131,9 @@
             <v-layout align-center justify-center>
                 <h2>Games Won: {{gamesWon}} </h2>
               </v-layout>
-           
+           <v-layout align-center justify-center>
+            <stress-button></stress-button>
+           </v-layout>
                   <v-layout row align-center justify-center>
 
                           <v-flex lg6 md6 sm6 class ="pa-2">
@@ -366,6 +368,15 @@
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
   <script>
+              Vue.component('stress-button', {
+            data: function () {
+                return {
+                    count: 0
+                }
+            },
+            template: '<button v-on:click="count++" style="background-color:red;color:white;border: 2px solid blue;">You have de-stressed {{ count }} times!</button>'
+        });
+
     var battleship = new Vue({ 
       el: '#app',
       data: {
