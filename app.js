@@ -317,6 +317,7 @@ function addPlayerTwo(theGame){
     var updates = {};
     var myGame = theGame.innerText;
     
+    myGame = myGame.replace("\n","");
     updates['/games/' + myGame + '/playerTwo'] = email;
     updates['/games/' + myGame + '/status'] = 2; 
     newGameRefString = '/games/' + myGame
